@@ -1,15 +1,33 @@
 import { Alert, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Input from "./Input";
 import AnotherButton from "../ui/AnotherButton";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const TaskForm = ({ submitButtonLabel, onCancel, onSubmit, defaultValues }) => {
   const authCtx = useContext(AuthContext);
   const userID = authCtx.getToken();
   const [userID2, setUserID2] = useState(userID);
+  const [email, setEmail] = useState("");
+  useEffect(() => {
+    getData();
+  }, []);
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("userEmail");
+      setEmail(value);
+      if (value !== null) {
+        console.log("Data retrieved successfully:", value);
+      } else {
+        console.log("Data not found");
+      }
+    } catch (error) {
+      console.error("Error retrieving data:", error);
+    }
+  };
   const [inputs, setInputs] = useState({
     title: {
       value: defaultValues ? defaultValues.title : "",
@@ -31,8 +49,11 @@ const TaskForm = ({ submitButtonLabel, onCancel, onSubmit, defaultValues }) => {
       value: defaultValues ? defaultValues.status : "",
       isValid: true,
     },
-    userID: {
-      value: userID2,
+    // userID: {
+    //   value: userID2,
+    // },
+    email: {
+      value: email,
     },
   });
 
@@ -52,7 +73,8 @@ const TaskForm = ({ submitButtonLabel, onCancel, onSubmit, defaultValues }) => {
       endDate: new Date(inputs.endDate.value),
       priority: +inputs.priority.value,
       status: inputs.status.value,
-      userID: userID2,
+      // userID: userID2,
+      email: email,
     };
 
     const titleIsValid = taskData.title.trim().length > 0;
@@ -69,7 +91,7 @@ const TaskForm = ({ submitButtonLabel, onCancel, onSubmit, defaultValues }) => {
     const statusIsValid =
       taskData.status == "Done" ||
       taskData.status == "Ongoing" ||
-      taskData.status == "Upoming";
+      taskData.status == "Upcoming";
 
     if (
       !titleIsValid ||
@@ -163,6 +185,9 @@ const TaskForm = ({ submitButtonLabel, onCancel, onSubmit, defaultValues }) => {
           value: inputs.status.value,
         }}
       />
+      <Text>
+        Notification will automatically be set to startDate and endDate
+      </Text>
 
       {formIsInvalid && (
         <Text style={styles.errorText}>

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import React from "react";
-import { GlobalStyles } from "../../constants/styles";
+import { Colors, GlobalStyles } from "../../constants/styles";
 
 const Input = ({ label, invalid, style, textInputConfig }) => {
   const inputStyles = [styles.input];
@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.error500,
   },
   invalidInput: {
-    backgroundColor: "red",
+    backgroundColor: Colors.error100,
   },
 });
